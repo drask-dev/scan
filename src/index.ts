@@ -42,7 +42,7 @@ export class PiiDetector {
     // Skip scan for oversized inputs
     if (new TextEncoder().encode(text).byteLength > this.config.maxInputBytes) {
       console.warn(
-        `Obex: Input exceeds ${this.config.maxInputBytes} bytes, skipping PII scan`,
+        `Velare: Input exceeds ${this.config.maxInputBytes} bytes, skipping PII scan`,
       );
       return { entities: [], redacted: text, score: 0, latencyMs: 0 };
     }
@@ -101,7 +101,7 @@ export class PiiDetector {
 
     if (this.config.scanWarnMs > 0 && latencyMs > this.config.scanWarnMs) {
       console.warn(
-        `Obex: PII scan took ${latencyMs.toFixed(1)}ms (>${this.config.scanWarnMs}ms threshold)`,
+        `Velare: PII scan took ${latencyMs.toFixed(1)}ms (>${this.config.scanWarnMs}ms threshold)`,
       );
     }
 
