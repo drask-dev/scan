@@ -1,5 +1,5 @@
 {
-  "name": "@drask-dev/detection",
+  "name": "@drask-dev/scan",
   "version": "0.3.0",
   "description": "PII detection engine — regex patterns and NER for structured and unstructured PII",
   "type": "module",
