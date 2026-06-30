@@ -1,4 +1,4 @@
-import { registerPatterns } from "./registry.js";
+import { registerDefaultPatterns } from "./registry.js";
 import { contactPatterns } from "./contact.js";
 import { financialPatterns } from "./financial.js";
 import { ukGovPatterns } from "./uk-gov.js";
@@ -18,7 +18,7 @@ const allBuiltIn = [
   ...secretsPatterns,
 ];
 
-registerPatterns(allBuiltIn);
+registerDefaultPatterns(allBuiltIn);
 
 export { contactPatterns } from "./contact.js";
 export { financialPatterns } from "./financial.js";

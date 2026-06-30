@@ -28,17 +28,10 @@ export const financialPatterns: PiiPattern[] = [
   },
 
   // UK sort code — exactly 6 digits in XX-XX-XX format (requires separators)
+  // No prefix exclusions: 20-xx-xx (Barclays) and 19-xx-xx are valid UK sort codes
   {
     type: "sort_code",
     regex: /\b\d{2}[-]\d{2}[-]\d{2}\b/gu,
     confidence: 0.6,
-    validate: (value: string) => {
-      // Reject if it looks like part of a date (year-month pattern)
-      const digits = value.replace(/-/gu, "");
-      const first2 = parseInt(digits.slice(0, 2), 10);
-      // Sort codes start 01-99 but never look like a year prefix (19, 20)
-      if (first2 === 19 || first2 === 20) return false;
-      return true;
-    },
   },
 ];

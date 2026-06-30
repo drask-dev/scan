@@ -7,7 +7,7 @@ import type { DetectionResult, DetectorConfig, PiiEntity, Sensitivity } from "./
 import "./patterns/index.js";
 
 export type { DetectionResult, DetectorConfig, PiiEntity, PiiEntityType, Sensitivity, PiiPattern } from "./types.js";
-export { registerPatterns, getPatterns } from "./patterns/registry.js";
+export { registerPatterns, getPatterns, clearPatterns, resetToDefaultPatterns } from "./patterns/registry.js";
 export { redact } from "./redaction.js";
 export { NER_ENTITY_TYPES } from "./ner.js";
 
@@ -20,6 +20,9 @@ const SENSITIVITY_THRESHOLDS: Record<Sensitivity, number> = {
 
 const DEFAULT_MAX_INPUT_BYTES = 102_400; // 100KB
 const DEFAULT_SCAN_WARN_MS = 100;
+// compromise.js tokenises the full string regardless of content; above this
+// length it stalls for seconds on repetitive/large inputs
+const NER_MAX_CHARS = 10_000;
 
 export class PiiDetector {
   private config: Required<DetectorConfig>;
@@ -86,7 +89,7 @@ export class PiiDetector {
     }
 
     // PASS 2: NER detection (person names, organizations, locations)
-    const nerEntities = detectWithNer(text);
+    const nerEntities = text.length <= NER_MAX_CHARS ? detectWithNer(text) : [];
     for (const entity of nerEntities) {
       if (this.config.exclude.includes(entity.type)) continue;
       if (this.config.entities.length > 0 && !this.config.entities.includes(entity.type)) continue;

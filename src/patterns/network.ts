@@ -15,10 +15,13 @@ export const networkPatterns: PiiPattern[] = [
     },
   },
 
-  // IPv6 — full and compressed forms
+  // IPv6 — full and compressed forms (RFC 4291)
+  // Covers: full (2001:0db8::), compressed (2001:db8::1), link-local (fe80::1)
+  // Excludes loopback (::1) and all-zeros (::)
   {
     type: "ip_address",
-    regex: /\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b/gu,
+    regex: /(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:|(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}|(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}|(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}|(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}|:(?::[0-9a-fA-F]{1,4}){1,7}|::/gu,
     confidence: 0.75,
+    validate: (value: string) => value !== "::1" && value !== "::",
   },
 ];

@@ -5,5 +5,4 @@ dist
 *.tgz
 .env
 .env.*
-.npmrc
 .DS_Store

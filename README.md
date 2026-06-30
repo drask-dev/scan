@@ -36,7 +36,7 @@ console.log(result.latencyMs); // ~2ms
 | **Contact** | Email, phone (UK, US, international) | 4 | — |
 | **Financial** | Credit card, debit card, IBAN, sort code | 4 | Luhn checksum (cards), date rejection (sort code) |
 | **UK Government** | National Insurance, NHS number, UTR, passport | 4 | NHS modulus 11 |
-| **Network** | IPv4, IPv6 | 2 | Excludes localhost/broadcast |
+| **Network** | IPv4, IPv6 (full and compressed) | 2 | Excludes localhost/broadcast/loopback |
 | **Location** | UK postcode | 1 | — |
 | **Temporal** | Date of birth (DD/MM/YYYY, ISO, US format) | 3 | — |
 | **Secrets** | AWS keys, generic API keys, Bearer tokens, JWT, Slack/GitHub/Stripe tokens | 8 | — |
@@ -74,14 +74,21 @@ const detector = new PiiDetector({
 ## Custom Patterns
 
 ```ts
-import { registerPatterns } from "@drask-dev/scan";
+import { registerPatterns, clearPatterns, resetToDefaultPatterns } from "@drask-dev/scan";
 
+// Add a custom pattern on top of the built-ins
 registerPatterns([{
-  type: "email",
+  type: "email",           // reuse an existing type, or cast to add your own label
   regex: /my-custom-pattern/g,
   confidence: 0.9,
   validate: (match) => match.length > 5, // optional validator
 }]);
+
+// Remove all patterns (built-ins included)
+clearPatterns();
+
+// Restore the 26 built-in patterns, discarding any custom additions
+resetToDefaultPatterns();
 ```
 
 ## API

@@ -11,10 +11,11 @@ export const ukGovPatterns: PiiPattern[] = [
   },
 
   // NHS number — 10 digits, validated by modulus 11
+  // Confidence 0.75 (above US phone 0.70) so the check-digit winner is preferred on identical spans
   {
     type: "nhs_number",
     regex: /\b\d{3}[\s-]?\d{3}[\s-]?\d{4}\b/gu,
-    confidence: 0.7,
+    confidence: 0.75,
     validate: nhsCheckDigit,
   },
 

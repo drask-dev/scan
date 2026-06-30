@@ -115,7 +115,7 @@ describe("nhs_number", () => {
   it("detects valid NHS numbers", () => {
     const r = sensitiveDetector.scan("NHS: 943 476 5919");
     const nhs = r.entities.filter((e) => e.type === "nhs_number");
-    expect(nhs.length).toBeGreaterThanOrEqual(0); // Only passes if check digit valid
+    expect(nhs.length).toBeGreaterThan(0);
   });
 
   it("rejects invalid check digits", () => {
@@ -249,14 +249,9 @@ describe("sort_code", () => {
     expect(r.entities.some((e) => e.type === "sort_code")).toBe(true);
   });
 
-  it("rejects values starting with 19 (date-like)", () => {
-    const r = detector.scan("Date: 19-03-25");
-    expect(r.entities.filter((e) => e.type === "sort_code")).toHaveLength(0);
-  });
-
-  it("rejects values starting with 20 (date-like)", () => {
-    const r = detector.scan("Date: 20-03-25");
-    expect(r.entities.filter((e) => e.type === "sort_code")).toHaveLength(0);
+  it("detects Barclays sort codes (20-xx-xx range)", () => {
+    const r = detector.scan("Sort code: 20-47-82");
+    expect(r.entities.some((e) => e.type === "sort_code")).toBe(true);
   });
 });
 
@@ -290,6 +285,21 @@ describe("ipv6", () => {
   it("detects full IPv6 addresses", () => {
     const r = detector.scan("Server: 2001:0db8:85a3:0000:0000:8a2e:0370:7334");
     expect(r.entities.some((e) => e.type === "ip_address")).toBe(true);
+  });
+
+  it("detects compressed IPv6 addresses", () => {
+    const r = detector.scan("Connected from 2001:db8::1");
+    expect(r.entities.some((e) => e.type === "ip_address")).toBe(true);
+  });
+
+  it("detects link-local IPv6 addresses", () => {
+    const r = detector.scan("Interface fe80::1 connected");
+    expect(r.entities.some((e) => e.type === "ip_address")).toBe(true);
+  });
+
+  it("excludes IPv6 loopback (::1)", () => {
+    const r = detector.scan("Loopback: ::1");
+    expect(r.entities.filter((e) => e.type === "ip_address")).toHaveLength(0);
   });
 });
 

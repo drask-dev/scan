@@ -5,7 +5,7 @@ export const contactPatterns: PiiPattern[] = [
   // Email — RFC 5322 simplified
   {
     type: "email",
-    regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gu,
+    regex: /[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,253}\.[a-zA-Z]{2,}/gu,
     confidence: 0.95,
   },
 
