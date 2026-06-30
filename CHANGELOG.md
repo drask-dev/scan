@@ -2,6 +2,16 @@
 
 All notable changes to `@drask-dev/scan` are documented here.
 
+## [0.6.2] — 2026-06-30
+
+### Fixed
+- **NER cold-start latency** — compromise.js now initialises all NER pipelines (people, organisations, locations) at module import time using a realistic seed sentence. First `scan()` call is consistently <5ms on warm instances; the ~250ms initialisation cost is paid once at import rather than on the first user request.
+- **Secrets `entity.value` now contains only the raw secret** — the AWS secret key and generic API key patterns previously stored the full `key_name = "value"` string as `entity.value` and replaced the variable name during redaction. Both patterns now use lookbehind assertions so `entity.value` is the token only, and redaction preserves the surrounding context (e.g. `aws_secret_access_key = [AWS_KEY_1]`).
+- **IBAN mod-97 check digit validation** — the IBAN pattern now validates check digits using the ISO 7064 Mod 97-10 algorithm. Structurally valid but semantically meaningless strings (e.g. `GB00NWBK60161331926819`) are rejected, eliminating a class of false positives relevant to compliance use cases.
+
+### Added
+- `ibanCheckDigit` validator exported from `validators.ts` (internal use; not part of the public API).
+
 ## [0.6.1] — 2026-06-27
 
 ### Fixed

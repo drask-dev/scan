@@ -1,5 +1,5 @@
 import type { PiiPattern } from "../types.js";
-import { luhn } from "./validators.js";
+import { luhn, ibanCheckDigit } from "./validators.js";
 
 /** Credit/debit cards, IBANs, sort codes */
 export const financialPatterns: PiiPattern[] = [
@@ -25,6 +25,7 @@ export const financialPatterns: PiiPattern[] = [
     type: "iban",
     regex: /\b[A-Z]{2}\d{2}[\s]?[A-Z0-9]{4}[\s]?(?:[A-Z0-9]{4}[\s]?){1,7}[A-Z0-9]{1,4}\b/gu,
     confidence: 0.85,
+    validate: ibanCheckDigit,
   },
 
   // UK sort code — exactly 6 digits in XX-XX-XX format (requires separators)

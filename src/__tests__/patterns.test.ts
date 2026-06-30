@@ -87,6 +87,17 @@ describe("iban", () => {
     const r = detector.scan("IBAN: DE89 3704 0044 0532 0130 00");
     expect(r.entities.some((e) => e.type === "iban")).toBe(true);
   });
+
+  it("rejects structurally valid IBANs with wrong check digits", () => {
+    // GB00 has same BBAN as valid GB29 NWBK... but check digits 00 give mod-97 = 69, not 1
+    const r = detector.scan("IBAN: GB00NWBK60161331926819");
+    expect(r.entities.filter((e) => e.type === "iban")).toHaveLength(0);
+  });
+
+  it("rejects the GB00XXXX placeholder example from the review", () => {
+    const r = detector.scan("IBAN: GB00XXXX00000000000000");
+    expect(r.entities.filter((e) => e.type === "iban")).toHaveLength(0);
+  });
 });
 
 // ── National Insurance ─────────────────────────────────────────
@@ -184,6 +195,28 @@ describe("aws_key", () => {
     const r = detector.scan('aws_secret_access_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"');
     expect(r.entities.some((e) => e.type === "aws_key")).toBe(true);
   });
+
+  it("entity value is the raw secret, not the surrounding key=value context", () => {
+    const secret = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
+    const r = detector.scan(`aws_secret_access_key = "${secret}"`);
+    const entity = r.entities.find((e) => e.type === "aws_key" && e.value === secret);
+    expect(entity).toBeDefined();
+    expect(entity!.value).toBe(secret);
+  });
+
+  it("redaction preserves the variable name and only replaces the secret value", () => {
+    const r = detector.scan('aws_secret_access_key = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"');
+    expect(r.redacted).toContain("aws_secret_access_key");
+    expect(r.redacted).not.toContain("wJalrXUtnFEMI");
+    expect(r.redacted).toContain("[AWS_KEY");
+  });
+
+  it("works without quotes", () => {
+    const secret = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
+    const r = detector.scan(`AWS_SECRET_ACCESS_KEY=${secret}`);
+    const entity = r.entities.find((e) => e.type === "aws_key" && e.value === secret);
+    expect(entity).toBeDefined();
+  });
 });
 
 // ── API Keys & Tokens ──────────────────────────────────────────
@@ -192,6 +225,21 @@ describe("api_key", () => {
   it("detects generic API keys", () => {
     const r = detector.scan('api_key = "sk-1234567890abcdef1234567890abcdef"');
     expect(r.entities.some((e) => e.type === "api_key")).toBe(true);
+  });
+
+  it("entity value is the raw token, not the surrounding key=value context", () => {
+    const token = "sk-1234567890abcdef1234567890abcdef";
+    const r = detector.scan(`api_key = "${token}"`);
+    const entity = r.entities.find((e) => e.type === "api_key" && e.value === token);
+    expect(entity).toBeDefined();
+    expect(entity!.value).toBe(token);
+  });
+
+  it("redaction preserves the variable name and only replaces the token value", () => {
+    const r = detector.scan('api_key = "sk-1234567890abcdef1234567890abcdef"');
+    expect(r.redacted).toContain("api_key");
+    expect(r.redacted).not.toContain("sk-1234567890abcdef");
+    expect(r.redacted).toContain("[API_KEY");
   });
 
   it("detects Bearer tokens", () => {

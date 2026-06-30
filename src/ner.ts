@@ -1,6 +1,12 @@
 import nlp from "compromise";
 import type { PiiEntity, PiiEntityType } from "./types.js";
 
+// Trigger compromise.js model initialization at import time so first scan() is
+// fast. A realistic sentence is needed — nlp(" ") alone doesn't prime all NER
+// pipelines (people/orgs/places lazy-load on first real proper noun encounter).
+const _w = nlp("Alice Smith works at Acme Corporation in London.");
+_w.people(); _w.organizations(); _w.places();
+
 /** NER confidence scores — lower than regex since NER is less precise */
 const NER_CONFIDENCE: Record<string, number> = {
   person_name: 0.7,

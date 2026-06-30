@@ -9,17 +9,20 @@ export const secretsPatterns: PiiPattern[] = [
     confidence: 0.95,
   },
 
-  // AWS Secret Access Key — 40 base64-ish chars after common assignment patterns
+  // AWS Secret Access Key — 40 base64-ish chars after common assignment patterns.
+  // Lookbehind captures only the secret value so entity.value is the raw key,
+  // not the surrounding key_name = "..." context.
   {
     type: "aws_key",
-    regex: /(?:aws_secret_access_key|AWS_SECRET_ACCESS_KEY|SecretAccessKey)[\s]*[=:]\s*["']?([A-Za-z0-9/+=]{40})["']?/gu,
+    regex: /(?<=(?:aws_secret_access_key|AWS_SECRET_ACCESS_KEY|SecretAccessKey)[\s]*[=:]\s*["']?)[A-Za-z0-9/+=]{40}/gu,
     confidence: 0.95,
   },
 
-  // Generic API key — common env var patterns with long hex/base64 values
+  // Generic API key — common env var patterns with long hex/base64 values.
+  // Lookbehind as above: entity.value is the token only, variable name is preserved in redaction.
   {
     type: "api_key",
-    regex: /(?:api[_-]?key|apikey|api[_-]?secret|api[_-]?token|auth[_-]?token|access[_-]?token|secret[_-]?key|private[_-]?key)[\s]*[=:]\s*["']?([A-Za-z0-9\-_.]{20,})["']?/giu,
+    regex: /(?<=(?:api[_-]?key|apikey|api[_-]?secret|api[_-]?token|auth[_-]?token|access[_-]?token|secret[_-]?key|private[_-]?key)[\s]*[=:]\s*["']?)[A-Za-z0-9\-_.]{20,}/giu,
     confidence: 0.85,
   },
 

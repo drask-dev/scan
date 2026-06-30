@@ -17,6 +17,23 @@ export function luhn(value: string): boolean {
   return sum % 10 === 0;
 }
 
+/** IBAN check digit validation (ISO 7064 Mod 97-10) */
+export function ibanCheckDigit(value: string): boolean {
+  const iban = value.replace(/\s/g, "");
+  if (iban.length < 15 || iban.length > 34) return false;
+
+  // Move first 4 chars (country + check digits) to end, then replace A-Z with 10-35
+  const rearranged = iban.slice(4) + iban.slice(0, 4);
+  const digits = rearranged.replace(/[A-Z]/g, (c) => String(c.charCodeAt(0) - 55));
+
+  // Iterative mod 97 — digit string exceeds JS safe integer range
+  let rem = 0;
+  for (const ch of digits) {
+    rem = (rem * 10 + Number(ch)) % 97;
+  }
+  return rem === 1;
+}
+
 /** NHS number check digit validation (modulus 11) */
 export function nhsCheckDigit(value: string): boolean {
   const digits = value.replace(/[\s-]/g, "");
