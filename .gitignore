@@ -7,3 +7,6 @@ dist
 .env.*
 .DS_Store
 LAUNCH_REVIEW.md
+
+# git worktrees (superpowers)
+.worktrees
