@@ -33,13 +33,13 @@ console.log(result.latencyMs); // ~2ms
 
 | Category | Entity Types | Count | Validators |
 |----------|-------------|-------|------------|
-| **Contact** | Email, phone (UK, US, international) | 4 | — |
+| **Contact** | Email, phone (UK, US, international) | 4 | None |
 | **Financial** | Credit card, debit card, IBAN, sort code | 4 | Luhn checksum (cards), date rejection (sort code) |
 | **UK Government** | National Insurance, NHS number, UTR, passport | 4 | NHS modulus 11 |
 | **Network** | IPv4, IPv6 (full and compressed) | 2 | Excludes localhost/broadcast/loopback |
-| **Location** | UK postcode | 1 | — |
-| **Temporal** | Date of birth (DD/MM/YYYY, ISO, US format) | 3 | — |
-| **Secrets** | AWS keys, generic API keys, Bearer tokens, JWT, Slack/GitHub/Stripe tokens | 8 | — |
+| **Location** | UK postcode | 1 | None |
+| **Temporal** | Date of birth (DD/MM/YYYY, ISO, US format) | 3 | None |
+| **Secrets** | AWS keys, generic API keys, Bearer tokens, JWT, Slack/GitHub/Stripe tokens | 8 | None |
 
 ## NER Detection
 
@@ -69,14 +69,14 @@ const detector = new PiiDetector({
 |-------|---------------------|-----------|
 | `low` | 0.8 | Only high-confidence matches (fewer false positives) |
 | `medium` | 0.5 | Balanced (default) |
-| `high` | 0.3 | Aggressive — catches more, including low-confidence patterns like passport numbers |
+| `high` | 0.3 | Aggressive. Catches more, including low-confidence patterns like passport numbers |
 
 ## Custom Patterns
 
 Pass additional patterns to the constructor. They're scoped to that `PiiDetector`
-instance only — other instances are unaffected, so it's safe to run detectors
-with different custom patterns side by side in the same process (e.g. one per
-tenant/policy).
+instance only, so other instances are unaffected. That makes it safe to run
+detectors with different custom patterns side by side in the same process,
+for example one per tenant or policy.
 
 ```ts
 import { PiiDetector } from "@drask-dev/scan";
