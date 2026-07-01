@@ -73,22 +73,23 @@ const detector = new PiiDetector({
 
 ## Custom Patterns
 
+Pass additional patterns to the constructor. They're scoped to that `PiiDetector`
+instance only — other instances are unaffected, so it's safe to run detectors
+with different custom patterns side by side in the same process (e.g. one per
+tenant/policy).
+
 ```ts
-import { registerPatterns, clearPatterns, resetToDefaultPatterns } from "@drask-dev/scan";
+import { PiiDetector } from "@drask-dev/scan";
 
-// Add a custom pattern on top of the built-ins
-registerPatterns([{
-  type: "email",           // reuse an existing type, or cast to add your own label
-  regex: /my-custom-pattern/g,
-  confidence: 0.9,
-  validate: (match) => match.length > 5, // optional validator
-}]);
-
-// Remove all patterns (built-ins included)
-clearPatterns();
-
-// Restore the 26 built-in patterns, discarding any custom additions
-resetToDefaultPatterns();
+const detector = new PiiDetector({
+  sensitivity: "high",
+  patterns: [{
+    type: "email",           // reuse an existing type, or cast to add your own label
+    regex: /my-custom-pattern/g,
+    confidence: 0.9,
+    validate: (match) => match.length > 5, // optional validator
+  }],
+});
 ```
 
 ## API

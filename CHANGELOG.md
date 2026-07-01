@@ -2,6 +2,12 @@
 
 All notable changes to `@drask-dev/scan` are documented here.
 
+## [0.7.0] — 2026-07-01
+
+### Changed — BREAKING
+
+- **Custom patterns are now instance-scoped, not global.** `registerPatterns()`, `clearPatterns()`, and `resetToDefaultPatterns()` are removed. Previously these mutated a single pattern list shared by every `PiiDetector` in the process — two detectors with different custom patterns would leak into each other once both had registered. Pass custom patterns to the constructor instead: `new PiiDetector({ patterns: [...] })`. See the README's "Custom Patterns" section for the new usage.
+
 ## [0.6.3] — 2026-06-30
 
 ### Fixed
