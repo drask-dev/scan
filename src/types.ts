@@ -59,6 +59,12 @@ export interface DetectorConfig {
   entities?: PiiEntityType[];
   /** Entity types to skip */
   exclude?: PiiEntityType[];
+  /**
+   * Additional patterns to detect, scoped to this PiiDetector instance only.
+   * Merged with the 26 built-in patterns. Does not affect other PiiDetector
+   * instances — there is no shared/global pattern registry.
+   */
+  patterns?: PiiPattern[];
   /** Maximum input size in bytes. Inputs exceeding this skip scanning. Default: 102400 (100KB). */
   maxInputBytes?: number;
   /** Warn when scan exceeds this many ms. Default: 100. Set to 0 to disable. */

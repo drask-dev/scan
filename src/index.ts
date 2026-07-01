@@ -1,13 +1,13 @@
 import { getPatterns } from "./patterns/registry.js";
 import { redact } from "./redaction.js";
 import { detectWithNer } from "./ner.js";
-import type { DetectionResult, DetectorConfig, PiiEntity, Sensitivity } from "./types.js";
+import type { DetectionResult, DetectorConfig, PiiEntity, PiiPattern, Sensitivity } from "./types.js";
 
 // Auto-register all built-in patterns on import
 import "./patterns/index.js";
 
 export type { DetectionResult, DetectorConfig, PiiEntity, PiiEntityType, Sensitivity, PiiPattern } from "./types.js";
-export { registerPatterns, getPatterns, clearPatterns, resetToDefaultPatterns } from "./patterns/registry.js";
+export { getPatterns } from "./patterns/registry.js";
 export { redact } from "./redaction.js";
 export { NER_ENTITY_TYPES } from "./ner.js";
 
@@ -25,7 +25,8 @@ const DEFAULT_SCAN_WARN_MS = 100;
 const NER_MAX_CHARS = 10_000;
 
 export class PiiDetector {
-  private config: Required<DetectorConfig>;
+  private config: Required<Omit<DetectorConfig, "patterns">>;
+  private patterns: PiiPattern[];
 
   constructor(config: DetectorConfig = {}) {
     this.config = {
@@ -35,6 +36,7 @@ export class PiiDetector {
       maxInputBytes: config.maxInputBytes ?? DEFAULT_MAX_INPUT_BYTES,
       scanWarnMs: config.scanWarnMs ?? DEFAULT_SCAN_WARN_MS,
     };
+    this.patterns = [...getPatterns(), ...(config.patterns ?? [])];
   }
 
   /**
@@ -54,7 +56,7 @@ export class PiiDetector {
     const threshold = SENSITIVITY_THRESHOLDS[this.config.sensitivity];
     const entities: PiiEntity[] = [];
 
-    for (const pattern of getPatterns()) {
+    for (const pattern of this.patterns) {
       // Skip excluded entity types
       if (this.config.exclude.includes(pattern.type)) continue;
 

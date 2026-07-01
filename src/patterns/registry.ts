@@ -1,34 +1,20 @@
 import type { PiiPattern } from "../types.js";
 
 /**
- * Central registry for all PII detection patterns.
- * Patterns are registered by region/category and merged at detection time.
+ * Read-only store for the built-in default patterns. Populated once at
+ * module import time by patterns/index.ts. Custom patterns are NOT stored
+ * here — they are passed to PiiDetector's constructor and scoped to that
+ * instance only (see DetectorConfig.patterns in types.ts). This avoids the
+ * cross-instance pattern leakage that a mutable global registry caused.
  */
-const patterns: PiiPattern[] = [];
-let builtinSnapshot: PiiPattern[] = [];
+let defaultPatterns: readonly PiiPattern[] = [];
 
-/** Register built-in patterns and snapshot them so resetToDefaultPatterns can restore them. */
-export function registerDefaultPatterns(newPatterns: PiiPattern[]): void {
-  builtinSnapshot = [...newPatterns];
-  patterns.push(...newPatterns);
+/** Called once at import time by patterns/index.ts to register the built-in set. */
+export function setDefaultPatterns(patterns: PiiPattern[]): void {
+  defaultPatterns = Object.freeze([...patterns]);
 }
 
-/** Register additional patterns on top of whatever is currently loaded. */
-export function registerPatterns(newPatterns: PiiPattern[]): void {
-  patterns.push(...newPatterns);
-}
-
+/** The 26 built-in patterns. Always the same set — never mutated at runtime. */
 export function getPatterns(): readonly PiiPattern[] {
-  return patterns;
-}
-
-/** Remove all patterns, including built-ins. Use resetToDefaultPatterns() to restore. */
-export function clearPatterns(): void {
-  patterns.length = 0;
-}
-
-/** Restore the 26 built-in patterns, discarding any custom patterns added via registerPatterns(). */
-export function resetToDefaultPatterns(): void {
-  patterns.length = 0;
-  patterns.push(...builtinSnapshot);
+  return defaultPatterns;
 }
