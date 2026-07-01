@@ -2,6 +2,17 @@
 
 All notable changes to `@drask-dev/scan` are documented here.
 
+## [0.6.3] — 2026-06-30
+
+### Fixed
+- **Sort code no longer fires on date strings at medium sensitivity** — confidence lowered from `0.6` to `0.45`, placing it below the medium threshold (`0.5`). Sort codes now require `sensitivity: "high"` to fire, eliminating false positives for UK fintech logs where `DD-MM-YY` date strings share the `XX-XX-XX` format.
+- **GitHub OAuth and user-to-server tokens now detected** — the GitHub PAT regex `gh[ps]_` has been extended to `gh[opsu]_`, adding coverage for `gho_` (OAuth tokens) and `ghu_` (user-to-server tokens from GitHub Apps).
+
+### Added
+- `SECURITY.md` — vulnerability disclosure policy and contact address.
+- `.gitattributes` — `* text=auto` to normalise line endings and eliminate CRLF warnings on Windows.
+- Warm-path performance test asserting `scan()` latency `< 5ms` on a pre-warmed instance, guarding the README's sub-5ms claim.
+
 ## [0.6.2] — 2026-06-30
 
 ### Fixed

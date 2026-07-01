@@ -165,4 +165,12 @@ describe("NER - performance", () => {
     const r = detector.scan(text);
     expect(r.latencyMs).toBeLessThan(50);
   });
+
+  it("warm-path scan completes in under 5ms", () => {
+    // NER is pre-warmed at import (compromise initialises at module load).
+    // Prime regex JIT with one call, then assert the warm path is <5ms.
+    detector.scan("Alice Johnson sent a message from London");
+    const r = detector.scan("Alice Johnson sent a message from London");
+    expect(r.latencyMs).toBeLessThan(5);
+  });
 });

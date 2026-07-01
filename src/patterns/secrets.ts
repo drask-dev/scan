@@ -47,10 +47,10 @@ export const secretsPatterns: PiiPattern[] = [
     confidence: 0.95,
   },
 
-  // GitHub personal access token
+  // GitHub personal access token (classic ghp_, server ghs_, OAuth gho_, user-to-server ghu_)
   {
     type: "api_key",
-    regex: /\bgh[ps]_[A-Za-z0-9]{36,}\b/gu,
+    regex: /\bgh[opsu]_[A-Za-z0-9]{36,}\b/gu,
     confidence: 0.95,
   },
 

@@ -29,10 +29,12 @@ export const financialPatterns: PiiPattern[] = [
   },
 
   // UK sort code — exactly 6 digits in XX-XX-XX format (requires separators)
-  // No prefix exclusions: 20-xx-xx (Barclays) and 19-xx-xx are valid UK sort codes
+  // No prefix exclusions: 20-xx-xx (Barclays) and 19-xx-xx are valid UK sort codes.
+  // Confidence 0.45: sits below the medium threshold (0.5) so it only fires at high
+  // sensitivity, avoiding false positives on date strings like "12-03-24".
   {
     type: "sort_code",
     regex: /\b\d{2}[-]\d{2}[-]\d{2}\b/gu,
-    confidence: 0.6,
+    confidence: 0.45,
   },
 ];

@@ -252,8 +252,18 @@ describe("api_key", () => {
     expect(r.entities.some((e) => e.type === "api_key")).toBe(true);
   });
 
-  it("detects GitHub PATs", () => {
+  it("detects GitHub PATs (ghp_ classic)", () => {
     const r = detector.scan("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij");
+    expect(r.entities.some((e) => e.type === "api_key")).toBe(true);
+  });
+
+  it("detects GitHub OAuth tokens (gho_)", () => {
+    const r = detector.scan("gho_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij");
+    expect(r.entities.some((e) => e.type === "api_key")).toBe(true);
+  });
+
+  it("detects GitHub user-to-server tokens (ghu_)", () => {
+    const r = detector.scan("ghu_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij");
     expect(r.entities.some((e) => e.type === "api_key")).toBe(true);
   });
 
@@ -292,14 +302,19 @@ describe("debit_card", () => {
 // ── Sort Code ─────────────────────────────────────────────────
 
 describe("sort_code", () => {
-  it("detects valid sort codes", () => {
-    const r = detector.scan("Sort code: 12-34-56");
+  it("detects valid sort codes at high sensitivity", () => {
+    const r = sensitiveDetector.scan("Sort code: 12-34-56");
     expect(r.entities.some((e) => e.type === "sort_code")).toBe(true);
   });
 
-  it("detects Barclays sort codes (20-xx-xx range)", () => {
-    const r = detector.scan("Sort code: 20-47-82");
+  it("detects Barclays sort codes (20-xx-xx range) at high sensitivity", () => {
+    const r = sensitiveDetector.scan("Sort code: 20-47-82");
     expect(r.entities.some((e) => e.type === "sort_code")).toBe(true);
+  });
+
+  it("does not fire on date strings at medium sensitivity", () => {
+    const r = detector.scan("Logged 12-03-24 and processed 20-06-26");
+    expect(r.entities.filter((e) => e.type === "sort_code")).toHaveLength(0);
   });
 });
 
